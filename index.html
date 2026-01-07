@@ -13,7 +13,22 @@
         mask-image: radial-gradient(circle at center, white 100%, transparent 100%);
         overflow: hidden;
       }
+      /* Custom Scrollbar for the chat area */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
+      }
     </style>
+    <script>
+      // Polyfill process for environments that don't provide it (like standard browsers)
+      window.process = window.process || { env: {} };
+    </script>
 <script type="importmap">
 {
   "imports": {
@@ -29,5 +44,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
+    <!-- Load the application entry point -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
