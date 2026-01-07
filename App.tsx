@@ -9,10 +9,12 @@ import {
   HelpCircle,
   Hash,
   MessageSquare,
-  Heart
+  Heart,
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
-import { Profile, Platform, Message } from './types.ts';
+import { Profile, Platform, Message, MessageStatus } from './types.ts';
 import ProfileEditor from './components/ProfileEditor.tsx';
 import ChatPreview from './components/ChatPreview.tsx';
 import { generateChatScript } from './services/gemini.ts';
@@ -41,12 +43,16 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [globalStatus, setGlobalStatus] = useState<MessageStatus>('read');
+  
+  const typingTimeoutRef = useRef<number | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
 
   useEffect(() => {
     parseScript();
-  }, [script]);
+  }, [script, globalStatus]);
 
   const parseScript = () => {
     const lines = script.split('\n');
@@ -66,12 +72,25 @@ const App: React.FC = () => {
           id: `${index}-${text}`,
           text,
           sender: isSenderLine ? 'sender' : 'receiver',
-          timestamp
+          timestamp,
+          status: isSenderLine ? globalStatus : undefined
         } as Message;
       })
       .filter(Boolean) as Message[];
     
     setMessages(newMessages);
+  };
+
+  const handleScriptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setScript(e.target.value);
+    
+    setIsTyping(true);
+    if (typingTimeoutRef.current) {
+      window.clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = window.setTimeout(() => {
+      setIsTyping(false);
+    }, 1500);
   };
 
   const handleGeminiMagic = async () => {
@@ -97,7 +116,7 @@ const App: React.FC = () => {
         link.click();
       } catch (error) {
         console.error("Capture failed", error);
-        alert("Failed to capture image. Ensure all assets (like profile pictures) are from CORS-enabled domains.");
+        alert("Failed to capture image.");
       }
     }
   };
@@ -156,25 +175,48 @@ const App: React.FC = () => {
             <ProfileEditor label="Receiver" profile={receiver} onChange={setReceiver} />
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 uppercase">
-              <Smartphone size={16} /> Platform
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {(['Tinder', 'WhatsApp', 'iMessage', 'Instagram', 'Messenger'] as Platform[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPlatform(p)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    platform === p 
-                    ? 'bg-slate-800 text-white shadow-md' 
-                    : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 gap-4">
+             <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 uppercase">
+                  <Smartphone size={16} /> Platform
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(['Tinder', 'WhatsApp', 'iMessage', 'Instagram', 'Messenger'] as Platform[]).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPlatform(p)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        platform === p 
+                        ? 'bg-slate-800 text-white shadow-md' 
+                        : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 uppercase">
+                  <CheckCheck size={16} /> Message Status
+                </div>
+                <div className="flex gap-2">
+                  {(['sent', 'delivered', 'read'] as MessageStatus[]).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setGlobalStatus(s)}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold capitalize transition-all border ${
+                        globalStatus === s 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 relative group">
@@ -200,18 +242,10 @@ const App: React.FC = () => {
             </div>
             <textarea
               value={script}
-              onChange={(e) => setScript(e.target.value)}
+              onChange={handleScriptChange}
               className="w-full h-80 bg-white border border-slate-200 rounded-lg p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-inner"
               placeholder="Start with > for sender or < for receiver..."
             />
-            
-            <div className="mt-3 p-3 bg-white/50 rounded-lg border border-slate-100 text-[11px] text-slate-500 space-y-1">
-              <p className="font-bold uppercase text-[9px] text-slate-400 mb-1 text-xs">Quick Guide</p>
-              <ul className="list-disc ml-4">
-                <li><code className="text-blue-600 font-bold">&gt;</code> for sender messages</li>
-                <li><code className="text-red-400 font-bold">&lt;</code> for receiver messages</li>
-              </ul>
-            </div>
           </div>
         </section>
 
@@ -231,6 +265,7 @@ const App: React.FC = () => {
             receiver={receiver} 
             messages={messages} 
             containerRef={previewRef}
+            isTyping={isTyping}
           />
 
           <div className="mt-8 flex gap-4 w-full justify-center">

@@ -1,5 +1,6 @@
 
 export type Platform = 'Tinder' | 'WhatsApp' | 'iMessage' | 'Instagram' | 'Messenger';
+export type MessageStatus = 'sent' | 'delivered' | 'read';
 
 export interface Profile {
   name: string;
@@ -12,6 +13,7 @@ export interface Message {
   text: string;
   sender: 'sender' | 'receiver';
   timestamp: string;
+  status?: MessageStatus;
 }
 
 export interface AppState {
