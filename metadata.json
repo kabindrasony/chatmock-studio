@@ -1,0 +1,8 @@
+{
+  "name": "ChatMock Studio",
+  "description": "A professional-grade fake chat generator for creating realistic conversation screenshots and screen recordings for social media, storytelling, and UI prototyping.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
