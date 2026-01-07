@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Camera, Phone, Info, MoreVertical, Send, Smile, Paperclip, ChevronLeft, Heart, Video, Mic, Image as ImageIcon, Plus, ThumbsUp } from 'lucide-react';
-import { Platform, Profile, Message } from '../types';
+import { Camera, Phone, Info, MoreVertical, Send, Smile, Paperclip, ChevronLeft, Video, Mic, Image as ImageIcon, Plus, ThumbsUp } from 'lucide-react';
+import { Platform, Profile, Message } from '../types.ts';
 
 interface ChatPreviewProps {
   platform: Platform;
@@ -148,7 +148,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({ platform, sender, receiver, m
             }`}>
               {msg.text}
             </div>
-            {isSender && <span className="text-[10px] text-slate-400 mt-1 px-1">Delivered</span>}
+            {isSender && <span className="text-[10px] text-slate-400 mt-1 px-1 text-right">Delivered</span>}
           </div>
         );
       case 'Instagram':
@@ -266,7 +266,6 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({ platform, sender, receiver, m
 
   const getBackground = () => {
     if (platform === 'WhatsApp') return 'bg-[#e5ddd5]';
-    if (platform === 'Messenger') return 'bg-white';
     return 'bg-white';
   };
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { User, Image as ImageIcon, X } from 'lucide-react';
-import { Profile } from '../types';
+import { Profile } from '../types.ts';
 
 interface ProfileEditorProps {
   label: string;
@@ -61,7 +61,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ label, profile, onChange 
           />
           <input
             type="text"
-            placeholder="Subtitle (e.g. Online)"
+            placeholder="Subtitle"
             value={profile.subtext}
             onChange={(e) => onChange({ ...profile, subtext: e.target.value })}
             className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-slate-500"

@@ -6,17 +6,16 @@ import {
   Wand2, 
   Trash2, 
   Smartphone, 
-  Copy, 
   HelpCircle,
   Hash,
   MessageSquare,
   Heart
 } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
-import { Profile, Platform, Message, AppState } from './types';
-import ProfileEditor from './components/ProfileEditor';
-import ChatPreview from './components/ChatPreview';
-import { generateChatScript } from './services/gemini';
+import { Profile, Platform, Message } from './types.ts';
+import ProfileEditor from './components/ProfileEditor.tsx';
+import ChatPreview from './components/ChatPreview.tsx';
+import { generateChatScript } from './services/gemini.ts';
 
 const INITIAL_SENDER: Profile = {
   name: 'Alex',
@@ -26,7 +25,7 @@ const INITIAL_SENDER: Profile = {
 const INITIAL_RECEIVER: Profile = {
   name: 'Jordan',
   avatar: 'https://picsum.photos/seed/jordan/200',
-  subtext: 'Matched on Tinder',
+  subtext: 'Online',
 };
 
 const INITIAL_SCRIPT = `> Yo! How's your day going?
@@ -98,6 +97,7 @@ const App: React.FC = () => {
         link.click();
       } catch (error) {
         console.error("Capture failed", error);
+        alert("Failed to capture image. Ensure all assets (like profile pictures) are from CORS-enabled domains.");
       }
     }
   };
@@ -139,7 +139,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row">
-      {/* Sidebar Controls */}
       <aside className="w-full lg:w-[450px] lg:h-screen lg:overflow-y-auto bg-white border-r border-slate-200 p-6 shadow-xl z-30">
         <header className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -148,17 +147,15 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-2xl font-black text-slate-800 tracking-tight">ChatMock Studio</h1>
           </div>
-          <p className="text-slate-500 text-sm">Create hyper-realistic fake chat screenshots and videos.</p>
+          <p className="text-slate-500 text-sm">Create realistic fake chat screenshots and videos.</p>
         </header>
 
         <section className="space-y-6">
-          {/* Profiles */}
           <div className="grid grid-cols-2 gap-4">
             <ProfileEditor label="Sender" profile={sender} onChange={setSender} />
             <ProfileEditor label="Receiver" profile={receiver} onChange={setReceiver} />
           </div>
 
-          {/* Platform Switcher */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
             <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 uppercase">
               <Smartphone size={16} /> Platform
@@ -180,7 +177,6 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Script Editor */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 relative group">
             <div className="flex items-center justify-between mb-3 text-sm font-semibold text-slate-500 uppercase">
               <div className="flex items-center gap-2">
@@ -210,24 +206,21 @@ const App: React.FC = () => {
             />
             
             <div className="mt-3 p-3 bg-white/50 rounded-lg border border-slate-100 text-[11px] text-slate-500 space-y-1">
-              <p className="font-bold uppercase text-[9px] text-slate-400 mb-1">Quick Guide</p>
+              <p className="font-bold uppercase text-[9px] text-slate-400 mb-1 text-xs">Quick Guide</p>
               <ul className="list-disc ml-4">
-                <li><code className="text-blue-600 font-bold">&gt;</code> for sender messages (right side)</li>
-                <li><code className="text-red-400 font-bold">&lt;</code> for receiver messages (left side)</li>
-                <li>New line starts a new bubble.</li>
+                <li><code className="text-blue-600 font-bold">&gt;</code> for sender messages</li>
+                <li><code className="text-red-400 font-bold">&lt;</code> for receiver messages</li>
               </ul>
             </div>
           </div>
         </section>
 
         <footer className="mt-12 text-center text-slate-400 text-xs flex items-center justify-center gap-1">
-           Built with <Heart size={10} className="text-red-400" fill="currentColor" /> for Creators
+           Built for Creators <Heart size={10} className="text-red-400" fill="currentColor" />
         </footer>
       </aside>
 
-      {/* Main Preview Area */}
       <main className="flex-1 p-8 flex flex-col items-center justify-center bg-slate-100 relative overflow-hidden">
-        {/* Background blobs for aesthetics */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 blur-[100px] rounded-full"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-400/10 blur-[100px] rounded-full"></div>
 
@@ -257,11 +250,6 @@ const App: React.FC = () => {
               <Video size={20} className={isRecording ? 'text-white' : 'text-red-500'} />
               {isRecording ? 'Stop Recording' : 'Start Recording'}
             </button>
-          </div>
-
-          <div className="mt-6 flex items-center gap-2 text-slate-400 text-sm">
-             <HelpCircle size={14} />
-             <span>Tips: Toggle Dark Mode or switch profile pictures to customize your vibe.</span>
           </div>
         </div>
       </main>
